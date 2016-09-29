@@ -71,7 +71,7 @@ public class BandDetailsFragment extends Fragment {
                         public void run() {
                             progressBar.setVisibility(ProgressBar.INVISIBLE);
 
-                            if(events.size()==0) textView.append("(no events found)");
+                            if(events.size()==0) textView.append("(no upcoming events found)");
                             else textView.append("All upcoming events for " + artist + ":\n\n");
 
                             try {
