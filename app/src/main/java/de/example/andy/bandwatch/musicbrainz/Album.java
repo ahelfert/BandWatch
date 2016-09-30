@@ -1,28 +1,34 @@
 package de.example.andy.bandwatch.musicbrainz;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by ACid on 29.09.2016.
  */
 
-public class Album {
+public class Album implements Comparable<Album> {
 
     private String title;
     private String type;
     private Date date;
-    private String label;
+    private String dateStr;
     private String arid; // MB Artist ID
     private String rgid; // MB Releasegroup ID
     private String reid; // MB Release ID
 
-    public Album(String arid, String rgid, String reid, String title, String type, Date date, String label) {
-        this.rgid = rgid;
+    private SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy", Locale.ENGLISH);
+    private SimpleDateFormat sdfMonth = new SimpleDateFormat("yyyy MMM", Locale.ENGLISH);
+    private SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy MMM d", Locale.ENGLISH);
+
+    public Album(String title, String type, Date date, String dateStr, String arid, String rgid, String reid) {
         this.title = title;
         this.type = type;
         this.date = date;
-        this.label = label;
+        this.dateStr = dateStr;
         this.arid = arid;
+        this.rgid = rgid;
         this.reid = reid;
     }
 
@@ -70,26 +76,35 @@ public class Album {
         return date;
     }
 
+    public String getFormattedDateStr() {
+        if (dateStr.length() == 4) return sdfYear.format(date);
+        if (dateStr.length() == 7) return sdfMonth.format(date);
+        else
+            return sdfDate.format(date);
+    }
+
     public void setDate(Date date) {
         this.date = date;
     }
 
-    public String getLabel() {
-        return label;
+    public String getDateStr() {
+        return dateStr;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setDateStr(String dateStr) {
+        this.dateStr = dateStr;
     }
 
     @Override
     public String toString() {
-        return "Album{" +
-                "title='" + title + '\'' +
-                ", type='" + type + '\'' +
-                ", date=" + date +
-                ", label='" + label + '\'' +
-                '}';
+        return "Album [title=" + title + ", type=" + type + ", date=" + date + ", dateStr=" + dateStr + ", arid=" + arid
+                + ", rgid=" + rgid + ", reid=" + reid + "]";
+    }
+
+    @Override
+    public int compareTo(Album album) {
+        // TODO Auto-generated method stub
+        return this.date.compareTo(album.date);
     }
 
 }

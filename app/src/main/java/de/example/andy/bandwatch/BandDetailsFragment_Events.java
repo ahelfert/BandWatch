@@ -12,14 +12,12 @@ import android.widget.TextView;
 import org.json.JSONException;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 import de.example.andy.bandwatch.bandintown.BandsInTownUtils;
-import de.example.andy.bandwatch.musicbrainz.Album;
-import de.example.andy.bandwatch.musicbrainz.MusicBrainzUtils;
+import de.example.andy.bandwatch.bandintown.Event;
 
-public class BandDetailsFragment extends Fragment {
+public class BandDetailsFragment_Events extends Fragment {
 
     private int position;
     private String artist;
@@ -28,13 +26,13 @@ public class BandDetailsFragment extends Fragment {
     private ProgressBar progressBar;
 
 
-    public static BandDetailsFragment newInstance(String artist) {
-        BandDetailsFragment fragment = new BandDetailsFragment();
+    public static BandDetailsFragment_Events newInstance(String artist) {
+        BandDetailsFragment_Events fragment = new BandDetailsFragment_Events();
         fragment.artist = artist;
         return fragment;
     }
 
-    public BandDetailsFragment() {
+    public BandDetailsFragment_Events() {
         //Required empty constructor
     }
 
@@ -66,17 +64,15 @@ public class BandDetailsFragment extends Fragment {
                         }
                     });
 
-                    final List<Album> albums = MusicBrainzUtils.getAlbums(artist);
-
-                    Collections.sort(albums);
+                    final List<Event> events = BandsInTownUtils.getEvents(artist, null, null);
 
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             progressBar.setVisibility(ProgressBar.INVISIBLE);
 
-                            if(albums.size()==0) textView.append("(no albums found)");
-                            else textView.append("Yet released albums for " + artist + ":\n\n");
+                            if(events.size()==0) textView.append("(no upcoming events found)");
+                            else textView.append("All upcoming events for " + artist + ":\n\n");
 
                             try {
                                 imageView.setImageBitmap(BandsInTownUtils.getArtistImage(artist));
@@ -86,8 +82,8 @@ public class BandDetailsFragment extends Fragment {
 
 
 
-                            for (Album album : albums) {
-                                textView.append(album.getDateStr() + " title: " + album.getTitle() + " type: " + album.getType() + "\n\n");
+                            for (Event event : events) {
+                                textView.append(event.getDateString() +  " in " + event.getVenue().getCity() + ", " + event.getVenue().getCountry() + " @ " + event.getVenue().getName() + "\n\n");
                                 //System.out.println(event);
                             }
                         }
