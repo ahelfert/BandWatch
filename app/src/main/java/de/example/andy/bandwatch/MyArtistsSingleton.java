@@ -1,6 +1,5 @@
 package de.example.andy.bandwatch;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,7 +10,7 @@ public class MyArtistsSingleton {
 
     private static MyArtistsSingleton instance = null;
 
-    public List<String> globalVarArtists = new ArrayList<>();
+    public List<String> globalVarArtists;
 
     private MyArtistsSingleton() {
     }

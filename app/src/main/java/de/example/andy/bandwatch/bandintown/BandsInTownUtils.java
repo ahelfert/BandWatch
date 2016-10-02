@@ -2,6 +2,7 @@ package de.example.andy.bandwatch.bandintown;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,7 +21,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import de.example.andy.bandwatch.NearbyFragment;
+
 public class BandsInTownUtils {
+
+    private static final String LOG_TAG = NearbyFragment.class.getSimpleName();
 
     private static final String URL = "http://api.bandsintown.com/artists/{0}/events{1}.json?api_version=2.0&app_id=BandWatch{2}{3}";
 
@@ -76,9 +81,7 @@ public class BandsInTownUtils {
         }
 
 
-        //System.out.println("before getFromServer()");
         String jsonString = BandsInTownUtils.getFromServer(MessageFormat.format(URL, artist, urlParamSearch, urlParamLocation, urlParamRadius));
-        //System.out.println("after getFromServer()");
 
         if (jsonString == "") return events;
 
@@ -135,6 +138,7 @@ public class BandsInTownUtils {
 
     public static String getFromServer(String url) throws IOException /* MalformedURLException */ {
         StringBuilder sb = new StringBuilder();
+        logv("BandsInTownUtils.getFromServer() for " + url);
         URL _url = new URL(url);
         HttpURLConnection httpURLConnection = (HttpURLConnection) _url.openConnection();
         final int responseCode = httpURLConnection.getResponseCode();
@@ -153,7 +157,7 @@ public class BandsInTownUtils {
         }
         httpURLConnection.disconnect();
 
-        //System.out.println("###LOG###: " + url);
+
         return sb.toString();
     }
 
@@ -173,5 +177,12 @@ public class BandsInTownUtils {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         return df.parse(input);
 
+    }
+
+    private static void log(String s) {
+        Log.d(LOG_TAG, s);
+    }
+    private static void logv(String s) {
+        Log.v(LOG_TAG, s);
     }
 }

@@ -1,5 +1,7 @@
 package de.example.andy.bandwatch.musicbrainz;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -7,6 +9,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.InterruptedIOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -18,7 +21,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import de.example.andy.bandwatch.NearbyFragment;
+
 public class MusicBrainzUtils {
+
+    private static final String LOG_TAG = NearbyFragment.class.getSimpleName();
 
     private static final String CLIENT_ID = "bandwatch.app-0.1.0";
 
@@ -52,8 +59,9 @@ public class MusicBrainzUtils {
         artist = URLEncoder.encode(artist, "UTF-8").replace("+", "%20"); // encode (white spaces etc)
 
         // fetch artist id (arid)
-        //System.out.println("// fetch artist id (arid)");
+        logv("fetch artist id for " + artist);
         String jsonString = getFromServer(MessageFormat.format(URL_ARTIST, artist));
+
         if (jsonString == "") return albums;
 
         JSONObject jsonObject = new JSONObject(jsonString);
@@ -70,7 +78,8 @@ public class MusicBrainzUtils {
         }
 
         // fetch all release groups
-        System.out.println("// fetch all release groups for: " + artist);
+
+        logv("// fetch all release groups for: " + artist);
         jsonString = getFromServer(MessageFormat.format(URL_RELEASEGROUP, arid));
         if (jsonString == "") return albums;
 
@@ -96,9 +105,8 @@ public class MusicBrainzUtils {
                 }
 
                 // fetch all releases of one release group
-                System.out.println("// fetch all releases of one release group for: " + title);
+                logv("// fetch all releases of one release group for: " + title);
                 jsonString = getFromServer(MessageFormat.format(URL_RELEASE, rgid));
-                //System.out.println("fetched");
 
                 if (jsonString == "") return albums;
 
@@ -119,7 +127,6 @@ public class MusicBrainzUtils {
                                 dateStr = jsonObject.getString(DATE);
                                 date = parseJsonDate(jsonObject.getString(DATE));
                             } catch (ParseException e) {
-                                System.out.println(jsonObject.getString(DATE));
                                 e.printStackTrace();
                             }
                         }
@@ -153,27 +160,42 @@ public class MusicBrainzUtils {
         StringBuilder sb = new StringBuilder();
         URL _url = new URL(url);
 
-        System.out.println(_url);
-        HttpURLConnection httpURLConnection = (HttpURLConnection) _url.openConnection();
-        long l1 = System.nanoTime();
-        final int responseCode = httpURLConnection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            InputStreamReader inputStreamReader = new InputStreamReader(httpURLConnection.getInputStream());
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                sb.append(line);
-            }
-            try {
-                bufferedReader.close();
-            } catch (IOException e) {
-                // ein Fehler beim Schließen wird bewusst ignoriert
-            }
-        }
-        httpURLConnection.disconnect();
-        System.out.println("musicbrainz response time: " + (System.nanoTime() - l1) / 1_000_000 + "ms");
+        //if(Thread.currentThread().isInterrupted()) return null;
+        logv(url);
 
-        //System.out.println("###LOG###: " + url);
+        HttpURLConnection httpURLConnection = null;
+        InputStreamReader inputStreamReader = null;
+        BufferedReader bufferedReader = null;
+
+
+        try {
+            long l1 = System.nanoTime();
+
+            httpURLConnection = (HttpURLConnection) _url.openConnection();
+            final int responseCode = httpURLConnection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                inputStreamReader = new InputStreamReader(httpURLConnection.getInputStream());
+                bufferedReader = new BufferedReader(inputStreamReader);
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    sb.append(line);
+                }
+                bufferedReader.close();
+            }
+            httpURLConnection.disconnect();
+
+            logv("musicbrainz response time: " + (System.nanoTime() - l1) / 1_000_000 + "ms");
+        } catch (InterruptedIOException e) {
+            if (httpURLConnection != null)
+                httpURLConnection.disconnect();
+            if (inputStreamReader != null)
+                inputStreamReader.close();
+            if (bufferedReader != null)
+                bufferedReader.close();
+            throw e; // rethrow to interrupt thread
+        }
+
+
         return sb.toString();
     }
 
@@ -185,5 +207,13 @@ public class MusicBrainzUtils {
         if (input.length() == 4) df = new SimpleDateFormat("yyyy");
         return df.parse(input);
 
+    }
+
+    private static void log(String s) {
+        Log.d(LOG_TAG, s);
+    }
+
+    private static void logv(String s) {
+        Log.v(LOG_TAG, s);
     }
 }

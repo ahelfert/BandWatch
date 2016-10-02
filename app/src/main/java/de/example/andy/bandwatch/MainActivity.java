@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.TextView;
 
@@ -17,6 +18,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private final static int MY_PERMISSIONS_REQUEST_READ_MEDIA = 123;
 
     private Toolbar toolbar;
@@ -26,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        log("onCreate");
+
         setContentView(R.layout.activity_main);
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -39,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager.setOffscreenPageLimit(3);
         setupViewPager(viewPager);
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -47,37 +52,11 @@ public class MainActivity extends AppCompatActivity {
         setupTabIcons();
 
 
-//        new Handler().post(new Runnable() {
-//            @Override
-//            public void run() {
-//                viewPager.setCurrentItem(1);
-//            }
-//        });
-
-        //        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-//
-//        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_MEDIA);
-//        } else {
-//            readDataExternal();
-//        }
     }
 
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-//        switch (requestCode) {
-//            case MY_PERMISSIONS_REQUEST_READ_MEDIA:
-//                if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-//                    readDataExternal();
-//                }
-//                break;
-//
-//            default:
-//                break;
-//        }
-//    }
-
     private void setupViewPager(ViewPager viewPager) {
+        log("setupViewPager()");
+
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new NewsFragment(), "1");
         adapter.addFragment(new BandsWrapperFragment(), "2");
@@ -88,12 +67,11 @@ public class MainActivity extends AppCompatActivity {
 
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(1);
+
     }
 
     private void setupTabIcons() {
-//        tabLayout.getTabAt(0).setIcon(R.drawable.ic_whatshot_black_24px);
-//        tabLayout.getTabAt(1).setIcon(R.drawable.ic_group_black_24px);
-//        tabLayout.getTabAt(2).setIcon(R.drawable.ic_location_city_black_24dp);
+        log("setupTabIcons()");
 
         // custom Tab Views um das Icon links vom Text anzuzeigen
         TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
@@ -111,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
         tabThree.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_location_city_black_24dp, 0, 0, 0);
         tabLayout.getTabAt(2).setCustomView(tabThree);
 
+
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
@@ -123,23 +102,62 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
+            log("ViewPagerAdapter.getItem()");
             return mFragmentList.get(position);
         }
 
 
         @Override
         public int getCount() {
+            //log("ViewPagerAdapter.getCount()");
             return mFragmentList.size();
         }
 
         public void addFragment(Fragment fragment, String title) {
+            log("ViewPagerAdapter.addFragment()");
             mFragmentList.add(fragment);
             mFragmentTitleList.add(title);
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
+            log("ViewPagerAdapter.getPageTitle()");
             return mFragmentTitleList.get(position);
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        log("onStart");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        log("onResume");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        log("onPause");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        log("onStop");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        log("onDestroy");
+    }
+
+
+    private static void log(String s) {
+        Log.d(LOG_TAG, s);
     }
 }

@@ -1,9 +1,11 @@
 package de.example.andy.bandwatch;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +23,8 @@ import java.util.List;
 
 public class BandsFragment extends ListFragment {
 
+    private static final String LOG_TAG = BandsFragment.class.getSimpleName();
+
     private List<String> artists;
     private AdapterView.OnItemClickListener listener;
     private ProgressBar progressBar;
@@ -33,7 +37,7 @@ public class BandsFragment extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        log("onCreate");
 
     }
 
@@ -53,6 +57,8 @@ public class BandsFragment extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        log("onCreateView");
+
         View rootView = inflater.inflate(R.layout.fragment_bands, container, false);
 
         progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
@@ -70,8 +76,10 @@ public class BandsFragment extends ListFragment {
                     }
                 });
 
+                long l1 = System.nanoTime();
                 artists = getArtists();
-                System.out.println("getArtists() called");
+                log("getArtists()");
+                log(artists.size() + " artists found in " + (System.nanoTime() - l1) / 1_000_000 + "ms");
 
                 // make Umlaute sorted correctly
                 Collator collator = Collator.getInstance();
@@ -108,7 +116,6 @@ public class BandsFragment extends ListFragment {
 
     private List<String> getArtists() {
 
-        //long l1 = System.nanoTime();
         List<String> songsList = new ArrayList<>();
 
         final Cursor mCursor = getActivity().getContentResolver().query(
@@ -124,7 +131,6 @@ public class BandsFragment extends ListFragment {
                 if ((index = mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)) != -1 && !(artist = mCursor.getString(index)).contains("<unknown>")) {
                     if (!songsList.contains(artist)) {
                         songsList.add(artist);
-                        //System.out.println(artist);
                     }
                 }
             } while (mCursor.moveToNext());
@@ -132,8 +138,61 @@ public class BandsFragment extends ListFragment {
 
         mCursor.close();
 
-        //System.out.println("runtime: " + (System.nanoTime() - l1) + "ns");
         return songsList;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        log("onStart");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        log("onResume");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        log("onPause");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        log("onStop");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        log("onDestroyView");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        log("onDestroy");
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        log("onAttach");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        log("onAttach");
+    }
+
+    private static void log(String s) {
+        Log.d(LOG_TAG, s);
     }
 
 }

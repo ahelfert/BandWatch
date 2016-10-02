@@ -1,7 +1,9 @@
 package de.example.andy.bandwatch;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,19 +14,24 @@ import android.widget.TextView;
 
 public class BandsWrapperFragment extends Fragment {
 
+    private static final String LOG_TAG = BandsWrapperFragment.class.getSimpleName();
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        log("onCreate");
 
-        BandsFragment bandsFragment = new BandsFragment();
+        final BandsFragment bandsFragment = new BandsFragment();
 
         bandsFragment.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override public void onItemClick(AdapterView<?> l, View v, int position, long id) {
                 BandDetailsFragment details = BandDetailsFragment.newInstance(((TextView)v).getText().toString());
                 getFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.container, details)
-                        .addToBackStack(null)
+                        //.replace(R.id.container, details) // not good, because replaced fragment will call its onDestroyView, so its better just to hide it
+                        .add(R.id.container, details)
+                        .addToBackStack(null) // adds transaction to backstack, so it could be reversed when back bttn pressed
+                        .hide(bandsFragment)
                         .commit();
             }
         });
@@ -39,7 +46,64 @@ public class BandsWrapperFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        log("onCreateView");
         return inflater.inflate(R.layout.fragment_bands_wrapper, container, false);
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        log("onStart");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        log("onResume");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        log("onPause");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        log("onStop");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        log("onDestroyView");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        log("onDestroy");
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        log("onAttach");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        log("onAttach");
+    }
+
+
+    private static void log(String s) {
+        Log.d(LOG_TAG, s);
     }
 
 
