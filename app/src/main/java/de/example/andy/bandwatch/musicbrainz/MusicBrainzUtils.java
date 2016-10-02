@@ -41,6 +41,7 @@ public class MusicBrainzUtils {
     private static final String RG = "release-groups";
     private static final String RELEASES = "releases";
 
+
     public static List<Album> getAlbums(String artist) throws JSONException, IOException /* MalformedURLException */ {
 
         List<Album> albums = new ArrayList<>();
@@ -54,7 +55,7 @@ public class MusicBrainzUtils {
         String rgid = null; // MB Releasegroup ID
         String reid = null; // MB Release ID
 
-        boolean alreadyAdded = false;
+        boolean alreadyAdded;
 
         artist = URLEncoder.encode(artist, "UTF-8").replace("+", "%20"); // encode (white spaces etc)
 
@@ -117,6 +118,7 @@ public class MusicBrainzUtils {
 
                     // iterate over releases and select the earliest release
                     for (int j = 0; j < jsonArrayReleases.length(); j++) {
+
                         jsonObject = jsonArrayReleases.getJSONObject(j);
                         if (jsonObject.has(ID)) {
                             reid = jsonObject.getString(ID);

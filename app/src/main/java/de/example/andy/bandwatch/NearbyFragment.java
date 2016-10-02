@@ -6,6 +6,8 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -64,6 +66,11 @@ public class NearbyFragment extends Fragment {
         progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
         progressTextView = (TextView) rootView.findViewById(R.id.progressTextView);
         textView = (TextView) rootView.findViewById(R.id.nearbyTextView);
+
+        if(!isNetworkAvailable()){
+            textView.append("\nNo internet connection available!\n\nPlease restart app with an internet connection..");
+            return rootView;
+        }
 
 
         LocationManager lm = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
@@ -232,6 +239,17 @@ public class NearbyFragment extends Fragment {
 
         log("onAttach");
     }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager mgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = mgr.getActiveNetworkInfo();
+        if (info != null && info.isConnected()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
 
     private static void log(String s) {

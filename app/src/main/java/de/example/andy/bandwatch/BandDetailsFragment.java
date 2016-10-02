@@ -2,6 +2,8 @@ package de.example.andy.bandwatch;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -69,6 +71,11 @@ public class BandDetailsFragment extends Fragment {
         progressTextView = (TextView) rootView.findViewById(R.id.progressTextView);
         textView = (TextView) rootView.findViewById(R.id.bandDetailsTextView);
         imageView = (ImageView) rootView.findViewById(R.id.imageView);
+
+        if (!isNetworkAvailable()) {
+            textView.append("No internet connection available!\n\nPlease restart app with an internet connection..");
+            return rootView;
+        }
 
 
         workingThread = new Thread(new Runnable() {
@@ -165,13 +172,13 @@ public class BandDetailsFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         log("onDestroy");
-        workingThread.interrupt();
+        if (workingThread != null)
+            workingThread.interrupt();
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
         log("onAttach");
     }
 
@@ -182,9 +189,20 @@ public class BandDetailsFragment extends Fragment {
         log("onAttach");
     }
 
+    private boolean isNetworkAvailable() {
+        ConnectivityManager mgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = mgr.getActiveNetworkInfo();
+        if (info != null && info.isConnected()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private static void log(String s) {
         Log.d(LOG_TAG, s);
     }
+
 
 //    // TODO: Rename parameter arguments, choose names that match
 //    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
