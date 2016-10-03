@@ -43,4 +43,4 @@ CREATE TABLE `album` (
 SELECT * FROM album WHERE arid = 111;
 
 SELECT event.event_id, event.venue_id, artist.name FROM event join event_artist on event_artist.event_id=event.event_id join artist on event_artist.arid = artist.arid;
-SELECT event.event_id, event.venue_id, artist.name FROM event join event_artist on event_artist.event_id=event.event_id join artist on event_artist.arid = artist.arid WHERE artist.name = "Biffy";
+SELECT event.event_id, event.venue_id, artist.name FROM event join event_artist on event_artist.event_id=event.event_id join artist on event_artist.arid = artist.arid WHERE artist.name = "Biffy Clyro";
