@@ -1,0 +1,46 @@
+
+CREATE TABLE `venue` (
+	`venue_id`	INTEGER,
+	`name`	TEXT NOT NULL,
+	`location`	TEXT,
+	`city`	TEXT NOT NULL,
+	`country`	TEXT,
+	`region`	TEXT,
+	PRIMARY KEY(`venue_id`)
+);
+CREATE TABLE `event_artist` (
+	`event_id`	INTEGER NOT NULL,
+	`arid`	INTEGER NOT NULL,
+	PRIMARY KEY(`event_id`,`arid`),
+	FOREIGN KEY(`event_id`) REFERENCES `event`(`event_id`),
+	FOREIGN KEY(`arid`) REFERENCES `artist`(`arid`)
+);
+CREATE TABLE `event` (
+	`event_id`	INTEGER,
+	`title`	TEXT,
+	`date`	TEXT NOT NULL,
+	`description`	TEXT,
+	`venue_id`	INTEGER NOT NULL,
+	PRIMARY KEY(`event_id`),
+	FOREIGN KEY(`venue_id`) REFERENCES `venue`(`venue_id`)
+);
+CREATE TABLE `artist` (
+	`arid`	INTEGER,
+	`name`	TEXT NOT NULL,
+	PRIMARY KEY(`arid`)
+);
+CREATE TABLE `album` (
+	`reid`	INTEGER,
+	`title`	TEXT NOT NULL,
+	`type`	TEXT,
+	`date`	TEXT NOT NULL,
+	`arid`	INTEGER NOT NULL,
+	`rgid`	INTEGER,
+	PRIMARY KEY(`reid`),
+	FOREIGN KEY(`arid`) REFERENCES artist(arid)
+); 
+
+SELECT * FROM album WHERE arid = 111;
+
+SELECT event.event_id, event.venue_id, artist.name FROM event join event_artist on event_artist.event_id=event.event_id join artist on event_artist.arid = artist.arid;
+SELECT event.event_id, event.venue_id, artist.name FROM event join event_artist on event_artist.event_id=event.event_id join artist on event_artist.arid = artist.arid WHERE artist.name = "Biffy Clyro";
