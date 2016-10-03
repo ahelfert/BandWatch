@@ -1,6 +1,8 @@
 package de.example.andy.bandwatch;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -8,7 +10,9 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,6 +38,7 @@ import static android.content.Context.LOCATION_SERVICE;
 public class NearbyFragment extends Fragment {
 
     private static final String LOG_TAG = NearbyFragment.class.getSimpleName();
+    private static final int GPS_REQUEST_CODE = 31;
 
     private List<String> artists;
     private ProgressBar progressBar;
@@ -45,6 +50,8 @@ public class NearbyFragment extends Fragment {
     private List<Address> addresses;
     private String city;
 
+    private boolean permissionsGranted;
+
     public NearbyFragment() {
         // Required empty public constructor
     }
@@ -53,27 +60,6 @@ public class NearbyFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         log("onCreate");
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        log("onCreateView");
-
-        View rootView = inflater.inflate(R.layout.fragment_nearby, container, false);
-
-        progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
-        progressTextView = (TextView) rootView.findViewById(R.id.progressTextView);
-        textView = (TextView) rootView.findViewById(R.id.nearbyTextView);
-
-        if(!isNetworkAvailable()){
-            textView.append("\nNo internet connection available!\n\nPlease restart app with an internet connection..");
-            return rootView;
-        }
-
-
-        LocationManager lm = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
 
         listener = new LocationListener() {
             @Override
@@ -98,19 +84,68 @@ public class NearbyFragment extends Fragment {
             @Override
             public void onProviderDisabled(String provider) {
                 log("LocationListener.onProviderDisabled");
-//                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-//                startActivity(intent);
             }
         };
 
-        lm.requestSingleUpdate(LocationManager.GPS_PROVIDER, listener, null);
+    }
 
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        log("onCreateView");
+
+        View rootView = inflater.inflate(R.layout.fragment_nearby, container, false);
+
+        progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
+        progressTextView = (TextView) rootView.findViewById(R.id.progressTextView);
+        textView = (TextView) rootView.findViewById(R.id.nearbyTextView);
+
+        // listNearbyEvents();
+        // check permissions for API>22
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                log("onCreateView: request permissions for gps");
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, GPS_REQUEST_CODE);
+                //return;
+            } else {
+                log("onCreateView: permissions for gps already granted");
+                listNearbyEvents();
+            }
+            //Log.d(TAG, "onCreate SDK fits.");
+        } else {
+            listNearbyEvents();
+        }
+
+        return rootView;
+
+    }
+
+    private void listNearbyEvents() {
+
+        if (!isNetworkAvailable()) {
+            textView.append("\nNo internet connection available!\n\nPlease restart app with an internet connection..");
+            return;
+        }
+
+
+        LocationManager lm = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+
+
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        lm.requestSingleUpdate(LocationManager.GPS_PROVIDER, listener, null);
         location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    final List<Event> events = new ArrayList<Event>();
+                    final List<Event> events = new ArrayList<>();
 
                     Geocoder geocoder = new Geocoder(getActivity().getBaseContext(), Locale.getDefault());
 
@@ -184,10 +219,6 @@ public class NearbyFragment extends Fragment {
 
             }
         }).start();
-
-
-        return rootView;
-
     }
 
     @Override
@@ -251,11 +282,27 @@ public class NearbyFragment extends Fragment {
     }
 
 
-
     private static void log(String s) {
         Log.d(LOG_TAG, s);
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 31:
+                log("onRequestPermissionsResult = 31");
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    log("grantResults contains PERMISSION_GRANTED");
+                    listNearbyEvents();
+                } else {
+                    textView.append("no gps permissions granted, nearby events functionality disabled");
+                    textView.setVisibility(View.VISIBLE);
+                }
+
+                return;
+        }
+
+    }
 }
 
 //import android.content.Context;

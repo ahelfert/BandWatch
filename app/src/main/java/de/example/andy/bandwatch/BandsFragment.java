@@ -1,9 +1,13 @@
 package de.example.andy.bandwatch;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,10 +24,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static android.content.ContentValues.TAG;
+
 
 public class BandsFragment extends ListFragment {
 
     private static final String LOG_TAG = BandsFragment.class.getSimpleName();
+    private static final int EXTERNAL_STORAGE_REQUEST_CODE = 51;
 
     private List<String> artists;
     private AdapterView.OnItemClickListener listener;
@@ -63,6 +70,28 @@ public class BandsFragment extends ListFragment {
 
         progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
         textView = (TextView) rootView.findViewById(R.id.textView);
+
+        // listArtists()
+        // check permissions for API>22
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                log("onCreateView: request permissions for external storage");
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_REQUEST_CODE);
+                //return;
+            } else {
+                log("onCreateView: permissions for external storage already granted");
+                listArtists();
+            }
+        } else {
+            listArtists();
+        }
+
+
+        return rootView;
+    }
+
+    private void listArtists() {
 
         new Thread(new Runnable() {
             public void run() {
@@ -109,9 +138,6 @@ public class BandsFragment extends ListFragment {
 
             }
         }).start();
-
-
-        return rootView;
     }
 
     private List<String> getArtists() {
@@ -193,6 +219,23 @@ public class BandsFragment extends ListFragment {
 
     private static void log(String s) {
         Log.d(LOG_TAG, s);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 51:
+                log("onRequestPermissionsResult = 51");
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "grantResults contains PERMISSION_GRANTED");
+                    listArtists();
+                } else {
+                    textView.append("no external storage permissions granted, music library scan functionality disabled");
+                    textView.setVisibility(View.VISIBLE);
+                }
+                return;
+        }
+
     }
 
 }
