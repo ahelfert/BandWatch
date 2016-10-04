@@ -50,8 +50,6 @@ public class NearbyFragment extends Fragment {
     private List<Address> addresses;
     private String city;
 
-    private boolean permissionsGranted;
-
     public NearbyFragment() {
         // Required empty public constructor
     }
@@ -123,6 +121,7 @@ public class NearbyFragment extends Fragment {
 
     }
 
+    @SuppressWarnings("MissingPermission")
     private void listNearbyEvents() {
 
         if (!isNetworkAvailable()) {
@@ -132,12 +131,6 @@ public class NearbyFragment extends Fragment {
 
 
         LocationManager lm = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
-
-
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
 
         lm.requestSingleUpdate(LocationManager.GPS_PROVIDER, listener, null);
         location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);

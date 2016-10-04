@@ -32,14 +32,15 @@
 
             <ImageView
                 android:id="@+id/imageView"
-                android:layout_width="100px"
-                android:layout_height="100px" />
+                android:layout_width="150px"
+                android:layout_height="150px" />
 
             <TextView
                 android:id="@+id/bandDetailsTextView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingTop="20px" />
+                android:paddingTop="20px"
+                android:paddingBottom="50dp"/>
         </LinearLayout>
     </ScrollView>
 

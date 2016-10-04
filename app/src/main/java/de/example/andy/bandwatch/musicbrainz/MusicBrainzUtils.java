@@ -71,7 +71,12 @@ public class MusicBrainzUtils {
 
         if (jsonObject.has(ARTISTS)) {
             jsonArray = jsonObject.getJSONArray(ARTISTS);
-            jsonObject = jsonArray.getJSONObject(0);
+            try {
+                jsonObject = jsonArray.getJSONObject(0);
+            } catch (JSONException e) {
+                // no element
+                return albums;
+            }
         }
 
         if (jsonObject.has(ID)) {

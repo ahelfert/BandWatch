@@ -107,6 +107,10 @@ public class BandsFragment extends ListFragment {
 
                 long l1 = System.nanoTime();
                 artists = getArtists();
+
+                artists.add("Die Ärzte");
+                artists.add("Fjørt");
+                artists.add("deqwdwedd");
                 log("getArtists()");
                 log(artists.size() + " artists found in " + (System.nanoTime() - l1) / 1_000_000 + "ms");
 

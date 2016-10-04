@@ -166,8 +166,15 @@ public class BandsInTownUtils {
         artist = URLEncoder.encode(artist, "UTF-8").replace("+", "%20"); // encode the string (white spaces etc)
         URL req = new URL("http://www.bandsintown.com/" + artist + "/photo/small.jpg");
         HttpURLConnection c = (HttpURLConnection) req.openConnection();
-        Bitmap bmp = BitmapFactory.decodeStream(c
-                .getInputStream());
+
+        Bitmap bmp = null;
+        try {
+            bmp = BitmapFactory.decodeStream(c
+                    .getInputStream());
+        } catch (IOException e) {
+            log(e.getClass().getSimpleName() + ": " + e.getMessage() + " for BandsInTownUtils.getArtistImage() for artist: " + artist);
+            //e.printStackTrace();
+        }
         c.disconnect();
         return bmp;
     }
