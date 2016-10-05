@@ -1,15 +1,9 @@
 package de.example.andy.bandwatch;
 
-//
-//import android.content.Context;
-//import android.database.SQLException;
-//import android.database.sqlite.SQLiteDatabase;
-//import android.database.sqlite.SQLiteOpenHelper;
-//import android.util.Log;
-//
-///**
-// * Created by Master on 04.10.2016.
-// */
+
+/**
+ * Created by Master on 04.10.2016.
+ */
 //
 //public class BandWatchDBHelper extends SQLiteOpenHelper {
 //
@@ -61,9 +55,6 @@ package de.example.andy.bandwatch;
 //            "country	TEXT," +
 //            "region	TEXT);";
 //
-//
-//
-//    public static final String SQL_DROP = "DROP TABLE IF EXISTS " + TABLE_SHOPPING_LIST;
 //
 //    public BandWatchDBHelper(Context con) {
 //        super(con, DB_NAME, null, DB_VERSION);  // DB wird angelegt

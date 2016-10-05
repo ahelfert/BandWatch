@@ -149,11 +149,7 @@ public class BandsInTownUtils {
             while ((line = bufferedReader.readLine()) != null) {
                 sb.append(line);
             }
-            try {
-                bufferedReader.close();
-            } catch (IOException e) {
-                // ein Fehler beim Schließen wird bewusst ignoriert
-            }
+            bufferedReader.close();
         }
         httpURLConnection.disconnect();
 
@@ -189,6 +185,7 @@ public class BandsInTownUtils {
     private static void log(String s) {
         Log.d(LOG_TAG, s);
     }
+
     private static void logv(String s) {
         Log.v(LOG_TAG, s);
     }

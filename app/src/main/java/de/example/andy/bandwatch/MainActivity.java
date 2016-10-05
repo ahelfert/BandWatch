@@ -19,7 +19,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
-    private final static int MY_PERMISSIONS_REQUEST_READ_MEDIA = 123;
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
@@ -73,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     private void setupTabIcons() {
         log("setupTabIcons()");
 
-        // custom Tab Views um das Icon links vom Text anzuzeigen
+        // custom Tab Views to show icon left of text label
         TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         tabOne.setText("  News");
         tabOne.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_whatshot_black_24px, 0, 0, 0);

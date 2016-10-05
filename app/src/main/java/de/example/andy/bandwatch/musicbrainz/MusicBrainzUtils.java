@@ -141,7 +141,7 @@ public class MusicBrainzUtils {
                     }
                     Collections.sort(releases); // sort by date
 
-                    // workaround: if date is just a year or month, select the release with more detailled date
+                    // workaround: if date is just a year or month, select the release with more detailed date
                     for (Album release : releases) {
                         if (release.getDateStr().length() == 10) {
                             albums.add(release);
